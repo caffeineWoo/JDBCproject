@@ -24,6 +24,11 @@ public class DatabaseConnection {
         return statement.executeQuery(query);
     }
 
+    public int executeUpdate(String query) throws SQLException {
+        Statement statement = connection.createStatement();
+        return statement.executeUpdate(query);
+    }
+
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {

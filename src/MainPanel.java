@@ -121,7 +121,7 @@ public class MainPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost/company";
                 String user = "root";
-                String password = "admin123";
+                String password = "0000";
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
@@ -152,7 +152,7 @@ public class MainPanel extends JPanel {
                 if (orderCheckBox.isSelected()) {
                     query += " ORDER BY " + orderBy;
                 }
-
+                System.out.println(query);
                 try {
                     ResultSet resultSet = dbConnection.executeQuery(query);
                     String resultText = Output.printResults(resultSet, columns);
@@ -179,12 +179,57 @@ public class MainPanel extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String condition = deleteField.getText();
-                // 여기에 튜플 삭제 로직 추가
-                // 예: DELETE FROM 테이블명 WHERE 조건
 
-                // 삭제 후 결과 표시
-                resultArea.setText("튜플이 삭제되었습니다.");
+                String url = "jdbc:mysql://localhost/company";
+                String user = "root";
+                String password = "0000";
+                DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
+
+                // 추가: 선택한 FROM 항목을 문자열로 추가
+                /* delete에서는 FROM에 table이 하나만 작성되어야 함. 
+                따라서 첫번째 인텍스만 받고 나머지 무시 */
+                String query = "DELETE";
+                ArrayList<String> selectedFromOptions =new ArrayList<>();
+                for (JCheckBox checkbox : fromCheckboxes) {
+                    if (checkbox.isSelected()) {
+                        selectedFromOptions.add(checkbox.getText());
+                    }
+                }
+                System.out.println(selectedFromOptions.size());
+                if ((!selectedFromOptions.isEmpty())&&(selectedFromOptions.size()<=1)) {
+                    String fromClause = " FROM " + String.join(", ", selectedFromOptions);
+                    query += fromClause;
+                   
+                    String condition = whereField.getText();
+                    if (whereCheckBox.isSelected()) {
+                        query += " WHERE " + condition;
+                    }
+                    System.out.println(query);
+                    try {
+                        
+                        int state = dbConnection.executeUpdate(query);
+                        //String resultText = Output.printResults(resultSet, columns);
+                        //resultArea.setText(resultText);
+                        System.out.print(state);
+                        dbConnection.closeConnection();
+                        if (state==0){
+                            resultArea.setText("아무 튜플도 삭제되지 않았습니다. 잘못된 입력이거나 없는 튜플입니다.");
+                        } else{
+                            resultArea.setText(state+"개의 튜플이 삭제되었습니다.");
+                        }
+                        
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                        resultArea.setText("에러 발생: " + ex.getMessage());
+                    }
+                    // 여기에 튜플 삭제 로직 추가
+                    // 예: DELETE FROM 테이블명 WHERE 조건
+
+                    // 삭제 후 결과 표시
+                    
+                } else{
+                    resultArea.setText("무조건 하나의 FROM 선택을 해야합니다.");
+                }
             }
         });
 
