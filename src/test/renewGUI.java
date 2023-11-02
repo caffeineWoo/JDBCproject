@@ -1,5 +1,8 @@
 package test;
 
+import test.DatabaseConnection;
+import test.Output;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -115,18 +118,27 @@ public class renewGUI extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost/company";
                 String user = "root";
-                String password = "0000";
+                String password = "admin123";
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
                 String columns = columnsField.getText();
+                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
+                if(columns.equals("*")) {columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dname";}
                 String query = "SELECT " + columns;
-
+                //(승우) 직원 선택시 부서 테이블을 자동으로 조인하기 위한 기본 조건 추가
+                String conditionDEFAULT = "";
                 // 추가: 선택한 FROM 항목을 문자열로 추가
                 List<String> selectedFromOptions = new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
                     if (checkbox.isSelected()) {
                         selectedFromOptions.add(checkbox.getText());
+                        //(승우)EMPLOYEE 선택하면 부서도 선택하고 기본조건 설정
+                        if (checkbox.getText().equals("EMPLOYEE")) {
+                            selectedFromOptions.add("department");
+                            conditionDEFAULT += "dno = dnumber";
+
+                        }
                     }
                 }
                 if (!selectedFromOptions.isEmpty()) {
@@ -135,8 +147,12 @@ public class renewGUI extends JPanel {
                 }
 
                 String condition = whereField.getText();
-                if (whereCheckBox.isSelected()) {
-                    query += " WHERE " + condition;
+                //(승우) 직원 선탯 시 기본 조건 처리
+                if(conditionDEFAULT.equals("dno = dnumber")) {
+                    query += " WHERE " + conditionDEFAULT;
+                    if (whereCheckBox.isSelected()) {
+                        query += " and " + condition;
+                    }
                 }
                 String groupBy = groupField.getText();
                 if (groupCheckBox.isSelected()) {
