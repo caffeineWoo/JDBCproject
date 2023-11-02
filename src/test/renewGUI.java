@@ -120,6 +120,7 @@ public class renewGUI extends JPanel {
                 String user = "root";
                 String password = "admin123";
 
+
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
                 String columns = columnsField.getText();
