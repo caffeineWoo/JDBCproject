@@ -123,10 +123,6 @@ public class renewGUI extends JPanel {
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
-                String columns = columnsField.getText();
-                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
-                if(columns.equals("*")) {columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dname";}
-                String query = "SELECT " + columns;
                 //(승우) 직원 선택시 부서 테이블을 자동으로 조인하기 위한 기본 조건 추가
                 String conditionDEFAULT = "";
                 // 추가: 선택한 FROM 항목을 문자열로 추가
@@ -142,6 +138,19 @@ public class renewGUI extends JPanel {
                         }
                     }
                 }
+                String columns = columnsField.getText();
+                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
+                String C_employee = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dname";
+                String C_works_on = "Essn, Pno, Hours";
+                String C_department = "Dname, Dnumber, Mgr_ssn, Mgr_start_date";
+                String C_dept_locations = "Dnumber, Dlocation";
+                String C_project ="Pname, Pnumber, Plocation, Dnum";
+                String C_dependent = "Essn, Dependent_name, Sex, Bdate, Relationship";
+                if(columns.equals("*")) {
+                    columns = C_employee;
+                }
+                String query = "SELECT " + columns;
+
                 if (!selectedFromOptions.isEmpty()) {
                     String fromClause = " FROM " + String.join(", ", selectedFromOptions);
                     query += fromClause;
