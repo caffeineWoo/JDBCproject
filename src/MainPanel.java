@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MainPanel extends JPanel {
     private List<JCheckBox> fromCheckboxes; // 추가: FROM 체크박스 리스트
-    private JTextField columnsField;
+    private final JTextField columnsField;
     private JCheckBox whereCheckBox;
     private JTextField whereField;
     private JCheckBox groupCheckBox;
@@ -121,22 +121,35 @@ public class MainPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String url = "jdbc:mysql://localhost/company";
                 String user = "root";
-<<<<<<< HEAD
-                String password = "0000";
-=======
+
                 String password = "admin123";
->>>>>>> ecf504b (커밋체크)
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
                 String columns = columnsField.getText();
+                System.out.println("columns = " + columns);
+                if(columns.equals("*")) {
+                    columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dname";
+                }
                 String query = "SELECT " + columns;
-
+                String conditionDEFAULT = "";
+                String condition = whereField.getText();
+                String groupBy = groupField.getText();
+                String orderBy = orderField.getText();
                 // 추가: 선택한 FROM 항목을 문자열로 추가
                 List<String> selectedFromOptions = new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
                     if (checkbox.isSelected()) {
                         selectedFromOptions.add(checkbox.getText());
+                        if (checkbox.getText().equals("EMPLOYEE")) {
+                            selectedFromOptions.add("department");
+                            conditionDEFAULT += "dno = dnumber";
+
+                        }
+                        System.out.print("selectedFromOptions :");
+                        System.out.println(checkbox.getText());
+
+
                     }
                 }
                 if (!selectedFromOptions.isEmpty()) {
@@ -144,23 +157,28 @@ public class MainPanel extends JPanel {
                     query += fromClause;
                 }
 
-                String condition = whereField.getText();
-                if (whereCheckBox.isSelected()) {
+                if(conditionDEFAULT.equals("dno = dnumber")) {
+                    query += " WHERE " + conditionDEFAULT;
+                    if (whereCheckBox.isSelected()) {
+                        query += " and " + condition;
+                    }
+                }
+                else if (whereCheckBox.isSelected()) {
                     query += " WHERE " + condition;
                 }
-                String groupBy = groupField.getText();
+
+
+
                 if (groupCheckBox.isSelected()) {
                     query += " GROUP BY " + groupBy;
                 }
-                String orderBy = orderField.getText();
+
                 if (orderCheckBox.isSelected()) {
                     query += " ORDER BY " + orderBy;
                 }
-<<<<<<< HEAD
-                System.out.println(query);
-=======
 
->>>>>>> ecf504b (커밋체크)
+                System.out.println(query);
+
                 try {
                     ResultSet resultSet = dbConnection.executeQuery(query);
                     String resultText = Output.printResults(resultSet, columns);
@@ -187,7 +205,7 @@ public class MainPanel extends JPanel {
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-<<<<<<< HEAD
+
 
                 String url = "jdbc:mysql://localhost/company";
                 String user = "root";
@@ -239,14 +257,14 @@ public class MainPanel extends JPanel {
                 } else{
                     resultArea.setText("무조건 하나의 FROM 선택을 해야합니다.");
                 }
-=======
+
                 String condition = deleteField.getText();
                 // 여기에 튜플 삭제 로직 추가
                 // 예: DELETE FROM 테이블명 WHERE 조건
 
                 // 삭제 후 결과 표시
                 resultArea.setText("튜플이 삭제되었습니다.");
->>>>>>> ecf504b (커밋체크)
+
             }
         });
 

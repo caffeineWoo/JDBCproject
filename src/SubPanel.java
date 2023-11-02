@@ -1,5 +1,3 @@
-package test;
-
 import test.DatabaseConnection;
 import test.Output;
 
@@ -13,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class renewGUI extends JPanel {
+public class SubPanel extends JPanel {
     private List<JCheckBox> fromCheckboxes; // 추가: FROM 체크박스 리스트
     private JTextField columnsField;
     private JCheckBox whereCheckBox;
@@ -31,7 +29,7 @@ public class renewGUI extends JPanel {
     private String opsel;
     private JButton executeButton;
     public JButton thisBtn;
-    public renewGUI() {
+    public SubPanel() {
         opsel="search";
         JPanel OpSelPanel = new JPanel(); // FROM 패널 추가
         OpSelPanel.setLayout(new GridLayout(1, 6));
@@ -120,49 +118,26 @@ public class renewGUI extends JPanel {
                 String user = "root";
                 String password = "admin123";
 
-
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
-                //(승우) 직원 선택시 부서 테이블을 자동으로 조인하기 위한 기본 조건 추가
-                String conditionDEFAULT = "";
+                String columns = columnsField.getText();
+                String query = "SELECT " + columns;
+
                 // 추가: 선택한 FROM 항목을 문자열로 추가
                 List<String> selectedFromOptions = new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
                     if (checkbox.isSelected()) {
                         selectedFromOptions.add(checkbox.getText());
-                        //(승우)EMPLOYEE 선택하면 부서도 선택하고 기본조건 설정
-                        if (checkbox.getText().equals("EMPLOYEE")) {
-                            selectedFromOptions.add("department");
-                            conditionDEFAULT += "dno = dnumber";
-
-                        }
                     }
                 }
-                String columns = columnsField.getText();
-                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
-                String C_employee = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, Dname";
-                String C_works_on = "Essn, Pno, Hours";
-                String C_department = "Dname, Dnumber, Mgr_ssn, Mgr_start_date";
-                String C_dept_locations = "Dnumber, Dlocation";
-                String C_project ="Pname, Pnumber, Plocation, Dnum";
-                String C_dependent = "Essn, Dependent_name, Sex, Bdate, Relationship";
-                if(columns.equals("*")) {
-                    columns = C_employee;
-                }
-                String query = "SELECT " + columns;
-
                 if (!selectedFromOptions.isEmpty()) {
                     String fromClause = " FROM " + String.join(", ", selectedFromOptions);
                     query += fromClause;
                 }
 
                 String condition = whereField.getText();
-                //(승우) 직원 선탯 시 기본 조건 처리
-                if(conditionDEFAULT.equals("dno = dnumber")) {
-                    query += " WHERE " + conditionDEFAULT;
-                    if (whereCheckBox.isSelected()) {
-                        query += " and " + condition;
-                    }
+                if (whereCheckBox.isSelected()) {
+                    query += " WHERE " + condition;
                 }
                 String groupBy = groupField.getText();
                 if (groupCheckBox.isSelected()) {
@@ -173,7 +148,6 @@ public class renewGUI extends JPanel {
                     query += " ORDER BY " + orderBy;
                 }
                 System.out.println(query);
-                System.out.println(columns);
                 try {
                     ResultSet resultSet = dbConnection.executeQuery(query);
                     String resultText = Output.printResults(resultSet, columns);
@@ -331,32 +305,6 @@ public class renewGUI extends JPanel {
     }
     private JPanel get_search(){
         JPanel thisPanel= new JPanel();
-        JButton executeButton = new JButton("실행");
-        thisPanel.add(executeButton);
-        executeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost/company";
-                String user = "root";
-                String password = "admin123";
-
-                DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
-
-                String query = "SELECT Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname FROM EMPLOYEE, department WHERE dno = dnumber";
-                String columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname";
-                System.out.println(query);
-
-                try {
-                    ResultSet resultSet = dbConnection.executeQuery(query);
-                    String resultText = Output.printResults(resultSet, columns);
-                    resultArea.setText(resultText);
-                    dbConnection.closeConnection();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    resultArea.setText("에러 발생: " + ex.getMessage());
-                }
-            }
-        });
         return thisPanel;
     }
     private JPanel get_delete(){
