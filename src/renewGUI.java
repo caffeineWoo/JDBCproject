@@ -7,11 +7,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.*;
 
-public class SubPanel extends JPanel {
+
+
+public class renewGUI extends JPanel {
+    String url = "jdbc:mysql://localhost/company";
+    String user = "root";
+    String password = "admin123";
     private List<JCheckBox> fromCheckboxes; // 추가: FROM 체크박스 리스트
     private JTextField columnsField;
     private JCheckBox whereCheckBox;
@@ -29,11 +33,11 @@ public class SubPanel extends JPanel {
     private String opsel;
     private JButton executeButton;
     public JButton thisBtn;
-    public SubPanel() {
-        opsel="search";
+    public renewGUI() {
+        opsel="report";
         JPanel OpSelPanel = new JPanel(); // FROM 패널 추가
         OpSelPanel.setLayout(new GridLayout(1, 6));
-        JLabel OpSelLabel = new JLabel("\t FROM");
+        JLabel OpSelLabel = new JLabel("\t MODE");
         OpSelPanel.add(OpSelLabel);
 
         optionbtns = new ButtonGroup();
@@ -114,31 +118,68 @@ public class SubPanel extends JPanel {
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost/company";
-                String user = "root";
-                String password = "admin123";
+//                String url = "jdbc:mysql://localhost/company";
+//                String user = "root";
+//                String password = "admin123";
+
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
-                String columns = columnsField.getText();
-                String query = "SELECT " + columns;
-
+                //(승우) 직원 선택시 부서 테이블을 자동으로 조인하기 위한 기본 조건 추가
+//                String conditionDEFAULT = "";
                 // 추가: 선택한 FROM 항목을 문자열로 추가
                 List<String> selectedFromOptions = new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
                     if (checkbox.isSelected()) {
                         selectedFromOptions.add(checkbox.getText());
+                        //(승우)EMPLOYEE 선택하면 부서도 선택하고 기본조건 설정
+//                        if (checkbox.getText().equals("EMPLOYEE")) {
+//                            selectedFromOptions.add("department");
+//                            conditionDEFAULT += "dno = dnumber";
+//
+//                        }
                     }
                 }
-                if (!selectedFromOptions.isEmpty()) {
-                    String fromClause = " FROM " + String.join(", ", selectedFromOptions);
-                    query += fromClause;
-                }
+                String columns = columnsField.getText();
+                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
 
-                String condition = whereField.getText();
-                if (whereCheckBox.isSelected()) {
-                    query += " WHERE " + condition;
+                String query = "";
+                String fromClause = "";
+
+                if (!selectedFromOptions.isEmpty()) {
+                    fromClause = " FROM " + String.join(", ", selectedFromOptions);
+
+                    if(columns.equals("*")) {
+                        columns = "";
+                        Map<String, String[]> tableColumns = new HashMap<>();
+                        tableColumns.put("EMPLOYEE", new String[]{"Fname", "Minit", "Lname", "Ssn", "Bdate", "Address", "Sex", "Salary", "Super_ssn", "Dno"});
+                        tableColumns.put("WORKS_ON", new String[]{"Essn", "Pno", "Hours"});
+                        tableColumns.put("DEPARTMENT", new String[]{"Dname", "Dnumber", "Mgr_ssn", "Mgr_start_date"});
+                        tableColumns.put("DEPT_LOCATIONS", new String[]{"Dnumber", "Dlocation"});
+                        tableColumns.put("PROJECT", new String[]{"Pname", "Pnumber", "Plocation", "Dnum"});
+                        tableColumns.put("DEPENDENT", new String[]{"Essn", "Dependent_name", "Sex", "Bdate", "Relationship"});
+
+//                        StringJoiner fromClause = new StringJoiner(", ");
+                        for (String selectedTable : selectedFromOptions) {
+                            if (tableColumns.containsKey(selectedTable)) {
+                                String[] columnList = tableColumns.get(selectedTable);
+                                if ( !columns.equals("") ) columns += ", ";
+                                columns += String.join(", ", columnList);
+                            }
+                        }
+
+                    }
                 }
+                query += " SELECT " + columns;
+                query += fromClause;
+                String condition = whereField.getText();
+                //(승우) 직원 선탯 시 기본 조건 처리
+//                if(conditionDEFAULT.equals("dno = dnumber")) {
+//                    query += " WHERE " + conditionDEFAULT;
+                    if (whereCheckBox.isSelected()) {
+                        query += " WHERE " + condition;
+                    }
+//                }
                 String groupBy = groupField.getText();
                 if (groupCheckBox.isSelected()) {
                     query += " GROUP BY " + groupBy;
@@ -148,6 +189,7 @@ public class SubPanel extends JPanel {
                     query += " ORDER BY " + orderBy;
                 }
                 System.out.println(query);
+                System.out.println(columns);
                 try {
                     ResultSet resultSet = dbConnection.executeQuery(query);
                     String resultText = Output.printResults(resultSet, columns);
@@ -175,9 +217,9 @@ public class SubPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                String url = "jdbc:mysql://localhost/company";
-                String user = "root";
-                String password = "0000";
+//                String url = "jdbc:mysql://localhost/company";
+//                String user = "root";
+//                String password = "0000";
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
                 // 추가: 선택한 FROM 항목을 문자열로 추가
@@ -229,7 +271,7 @@ public class SubPanel extends JPanel {
         });
 
     }
-    private JPanel get_report(){
+    private JPanel get_search(){
         
         
 
@@ -303,8 +345,34 @@ public class SubPanel extends JPanel {
 
         return thisPanel;
     }
-    private JPanel get_search(){
+    private JPanel get_report(){
         JPanel thisPanel= new JPanel();
+        JButton executeButton = new JButton("실행");
+        thisPanel.add(executeButton);
+        executeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                String url = "jdbc:mysql://localhost/company";
+//                String user = "root";
+//                String password = "admin123";
+
+                DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
+
+                String query = "SELECT Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname FROM EMPLOYEE, department WHERE dno = dnumber";
+                String columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname";
+                System.out.println(query);
+
+                try {
+                    ResultSet resultSet = dbConnection.executeQuery(query);
+                    String resultText = Output.printResults(resultSet, columns);
+                    resultArea.setText(resultText);
+                    dbConnection.closeConnection();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    resultArea.setText("에러 발생: " + ex.getMessage());
+                }
+            }
+        });
         return thisPanel;
     }
     private JPanel get_delete(){

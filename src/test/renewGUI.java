@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JScrollPane;
 
 
 public class renewGUI extends JPanel {
@@ -125,30 +128,15 @@ public class renewGUI extends JPanel {
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                String url = "jdbc:mysql://localhost/company";
-//                String user = "root";
-//                String password = "admin123";
-
-
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
-                //(승우) 직원 선택시 부서 테이블을 자동으로 조인하기 위한 기본 조건 추가
-//                String conditionDEFAULT = "";
-                // 추가: 선택한 FROM 항목을 문자열로 추가
                 List<String> selectedFromOptions = new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
                     if (checkbox.isSelected()) {
                         selectedFromOptions.add(checkbox.getText());
-                        //(승우)EMPLOYEE 선택하면 부서도 선택하고 기본조건 설정
-//                        if (checkbox.getText().equals("EMPLOYEE")) {
-//                            selectedFromOptions.add("department");
-//                            conditionDEFAULT += "dno = dnumber";
-//
-//                        }
                     }
                 }
                 String columns = columnsField.getText();
-                //(승우) select * 처리 -> 지금은 employee 테이블에서만 *가 적용됩니다..
 
                 String query = "";
                 String fromClause = "";
@@ -166,7 +154,6 @@ public class renewGUI extends JPanel {
                         tableColumns.put("PROJECT", new String[]{"Pname", "Pnumber", "Plocation", "Dnum"});
                         tableColumns.put("DEPENDENT", new String[]{"Essn", "Dependent_name", "Sex", "Bdate", "Relationship"});
 
-//                        StringJoiner fromClause = new StringJoiner(", ");
                         for (String selectedTable : selectedFromOptions) {
                             if (tableColumns.containsKey(selectedTable)) {
                                 String[] columnList = tableColumns.get(selectedTable);
@@ -180,13 +167,9 @@ public class renewGUI extends JPanel {
                 query += " SELECT " + columns;
                 query += fromClause;
                 String condition = whereField.getText();
-                //(승우) 직원 선탯 시 기본 조건 처리
-//                if(conditionDEFAULT.equals("dno = dnumber")) {
-//                    query += " WHERE " + conditionDEFAULT;
-                    if (whereCheckBox.isSelected()) {
-                        query += " WHERE " + condition;
-                    }
-//                }
+                if (whereCheckBox.isSelected()) {
+                    query += " WHERE " + condition;
+                }
                 String groupBy = groupField.getText();
                 if (groupCheckBox.isSelected()) {
                     query += " GROUP BY " + groupBy;
@@ -283,8 +266,6 @@ public class renewGUI extends JPanel {
 
     }
     private JPanel get_search(){
-        
-        
 
         JPanel selectPanel = new JPanel(); // SELECT 패널 추가
         selectPanel.setLayout(new GridLayout(1, 2));
@@ -368,12 +349,11 @@ public class renewGUI extends JPanel {
         JPanel thisPanel= new JPanel();
         JButton executeButton = new JButton("실행");
         thisPanel.add(executeButton);
+
+
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                String url = "jdbc:mysql://localhost/company";
-//                String user = "root";
-//                String password = "admin123";
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
@@ -385,6 +365,7 @@ public class renewGUI extends JPanel {
                     ResultSet resultSet = dbConnection.executeQuery(query);
                     String resultText = Output.printResults(resultSet, columns);
                     resultArea.setText(resultText);
+
                     dbConnection.closeConnection();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
