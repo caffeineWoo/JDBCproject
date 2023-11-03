@@ -27,6 +27,8 @@ public class renewGUI extends JPanel {
     private JTextField whereField;
     private JCheckBox groupCheckBox;
     private JTextField groupField;
+    private JCheckBox havingCheckBox;
+    private JTextField havingField;
     private JCheckBox orderCheckBox;
     private JTextField orderField;
     private JTextArea resultArea;
@@ -189,6 +191,10 @@ public class renewGUI extends JPanel {
                 if (groupCheckBox.isSelected()) {
                     query += " GROUP BY " + groupBy;
                 }
+                String having = havingField.getText();
+                if (havingCheckBox.isSelected()) {
+                    query += " HAVING " + having;
+                }
                 String orderBy = orderField.getText();
                 if (orderCheckBox.isSelected()) {
                     query += " ORDER BY " + orderBy;
@@ -314,6 +320,13 @@ public class renewGUI extends JPanel {
         groupPanel.add(groupCheckBox);
         groupPanel.add(groupField);
 
+        JPanel havingPanel = new JPanel(); // GROUP BY 패널 추가
+        havingPanel.setLayout(new GridLayout(1, 2));
+        havingCheckBox = new JCheckBox("HAVING");
+        havingField = new JTextField(0);
+        havingPanel.add(havingCheckBox);
+        havingPanel.add(havingField);
+
         JPanel orderPanel = new JPanel(); // ORDER BY 패널 추가
         orderPanel.setLayout(new GridLayout(1, 2));
         orderCheckBox = new JCheckBox("Use ORDER BY");
@@ -321,12 +334,13 @@ public class renewGUI extends JPanel {
         orderPanel.add(orderCheckBox);
         orderPanel.add(orderField);
 
-        JPanel thisPanel= new JPanel(new GridLayout(5, 1));
+        JPanel thisPanel= new JPanel(new GridLayout(6, 1));
         
         thisPanel.add(selectPanel);
         thisPanel.add(fromPanel);
         thisPanel.add(wherePanel);
         thisPanel.add(groupPanel);
+        thisPanel.add(havingPanel);
         thisPanel.add(orderPanel);
 
         whereCheckBox.addActionListener(new ActionListener() {
