@@ -20,7 +20,6 @@ public class Main {
         // 패널 생성
         renewGUI mainPanel = new renewGUI();
         frame.add(mainPanel);
-
         frame.setVisible(true);
     }
 }
