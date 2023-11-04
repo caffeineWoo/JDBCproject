@@ -42,6 +42,7 @@ public class renewGUI extends JPanel {
     private ButtonGroup optionbtns;
     private String opsel;
     private JButton executeButton;
+    private JButton reportButton;
     public JButton thisBtn;
     public renewGUI() {
         opsel="report";
@@ -66,8 +67,9 @@ public class renewGUI extends JPanel {
         insertButton = new JButton("Insert Tuple");
         deleteButton = new JButton("Delete Tuple");
         executeButton = new JButton("Query");
+        reportButton = new JButton("report");
 
-        thisBtn=executeButton;
+        thisBtn=reportButton;
         resultArea = new JTextArea(25, 20);
         resultArea.setEditable(false);
         Opbutten.addActionListener(new ActionListener() {
@@ -88,7 +90,7 @@ public class renewGUI extends JPanel {
                 remove(2);
                 remove(1);
                 if (opsel.equals("report")){
-                    thisBtn=executeButton;
+                    thisBtn=reportButton;
                     add(get_report(),BorderLayout.CENTER);
                 }else if (opsel.equals("search")){
                     thisBtn=executeButton;
@@ -347,11 +349,11 @@ public class renewGUI extends JPanel {
     }
     private JPanel get_report(){
         JPanel thisPanel= new JPanel();
-        JButton executeButton = new JButton("실행");
-        thisPanel.add(executeButton);
+//        JButton executeButton = new JButton("실행");
+//        thisPanel.add(executeButton);
 
 
-        executeButton.addActionListener(new ActionListener() {
+        reportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
