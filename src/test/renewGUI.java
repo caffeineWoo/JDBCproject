@@ -46,13 +46,13 @@ public class renewGUI extends JPanel {
     public JButton thisBtn;
     public renewGUI() {
         opsel="report";
-        JPanel OpSelPanel = new JPanel(); // FROM 패널 추가
+        JPanel OpSelPanel = new JPanel(); // MODE 패널 추가
         OpSelPanel.setLayout(new GridLayout(1, 6));
         JLabel OpSelLabel = new JLabel("\t MODE");
         OpSelPanel.add(OpSelLabel);
 
         optionbtns = new ButtonGroup();
-        String[] Options = {"report", "search", "insert", "delete"}; // FROM 항목 리스트
+        String[] Options = {"report", "search", "insert", "delete"}; // MODE 항목 리스트
         for (String option : Options) {
             JRadioButton optionbtn = new JRadioButton(option);
             optionbtns.add(optionbtn);
@@ -115,8 +115,8 @@ public class renewGUI extends JPanel {
         });
 
 
-        inputPanel.add(thisBtn, BorderLayout.NORTH);
-        inputPanel.add(new JScrollPane(resultArea), BorderLayout.SOUTH);
+        inputPanel.add(thisBtn, BorderLayout.NORTH);//input 패널의 상단에 버튼 설치
+        inputPanel.add(new JScrollPane(resultArea), BorderLayout.SOUTH);//input 패널의 하단에 결과 텍스트
 
         
         setLayout(new BorderLayout());
@@ -124,9 +124,30 @@ public class renewGUI extends JPanel {
         add(OpSelPanel,BorderLayout.NORTH);
         add(get_report(),BorderLayout.CENTER);
         add(inputPanel, BorderLayout.SOUTH);
-        
 
-        
+        //하단 버튼을 눌렀을 떄 JPanel에서 가져온 정보로 쿼리를 만들고 쿼리를 전송한다.
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //커넥션
+                DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
+
+                String query = "SELECT Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname FROM EMPLOYEE, department WHERE dno = dnumber";
+                String columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname";
+                System.out.println(query);
+
+                try {
+                    ResultSet resultSet = dbConnection.executeQuery(query);
+                    String resultText = Output.printResults(resultSet, columns);
+                    resultArea.setText(resultText);
+
+                    dbConnection.closeConnection();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    resultArea.setText("에러 발생: " + ex.getMessage());
+                }
+            }
+        });
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -208,7 +229,6 @@ public class renewGUI extends JPanel {
                 resultArea.setText("튜플이 삽입되었습니다.");
             }
         });
-
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -267,6 +287,8 @@ public class renewGUI extends JPanel {
         });
 
     }
+
+    //패널에 표현될 정보를 JPanel에 담는다.
     private JPanel get_search(){
 
         JPanel selectPanel = new JPanel(); // SELECT 패널 추가
@@ -344,39 +366,25 @@ public class renewGUI extends JPanel {
                 orderField.setEnabled(orderCheckBox.isSelected());
             }
         });
-
-        return thisPanel;
-    }
-    private JPanel get_report(){
-        JPanel thisPanel= new JPanel();
-//        JButton executeButton = new JButton("실행");
-//        thisPanel.add(executeButton);
-
-
-        reportButton.addActionListener(new ActionListener() {
+        havingCheckBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
-
-                String query = "SELECT Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname FROM EMPLOYEE, department WHERE dno = dnumber";
-                String columns = "Fname, Minit, Lname, Ssn, Bdate, Address, Sex, Salary, Super_ssn, dname";
-                System.out.println(query);
-
-                try {
-                    ResultSet resultSet = dbConnection.executeQuery(query);
-                    String resultText = Output.printResults(resultSet, columns);
-                    resultArea.setText(resultText);
-
-                    dbConnection.closeConnection();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    resultArea.setText("에러 발생: " + ex.getMessage());
-                }
+                havingField.setEnabled(havingCheckBox.isSelected());
             }
         });
         return thisPanel;
     }
+    private JPanel get_report() {
+        JPanel thisPanel = new JPanel();
+        JLabel titleLabel = new JLabel("<html><div style='text-align: center;'><br>데이터 베이스 기초 105조<br>EMPLOYEE TABLE REPORT</div></html>");
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        thisPanel.add(titleLabel);
+        return thisPanel;
+    }
+
+
+
     private JPanel get_delete(){
 
         JPanel fromPanel = new JPanel(); // FROM 패널 추가
