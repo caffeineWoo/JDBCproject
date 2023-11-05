@@ -233,14 +233,12 @@ public class renewGUI extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-//                String url = "jdbc:mysql://localhost/company";
-//                String user = "root";
-//                String password = "0000";
+
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
                 // 추가: 선택한 FROM 항목을 문자열로 추가
                 /* delete에서는 FROM에 table이 하나만 작성되어야 함. 
-                따라서 첫번째 인텍스만 받고 나머지 무시 */
+                따라서 1개 초과, 1개 미만이 선택된 경우 예외처리 */
                 String query = "DELETE";
                 ArrayList<String> selectedFromOptions =new ArrayList<>();
                 for (JCheckBox checkbox : fromCheckboxes) {
@@ -248,15 +246,14 @@ public class renewGUI extends JPanel {
                         selectedFromOptions.add(checkbox.getText());
                     }
                 }
-                System.out.println(selectedFromOptions.size());
                 if ((!selectedFromOptions.isEmpty())&&(selectedFromOptions.size()<=1)) {
                     String fromClause = " FROM " + String.join(", ", selectedFromOptions);
                     query += fromClause;
                    
                     String condition = whereField.getText();
-                    if (whereCheckBox.isSelected()) {
-                        query += " WHERE " + condition;
-                    }
+                    
+                    query += " WHERE " + condition;
+                    
                     System.out.println(query);
                     try {
                         
@@ -275,10 +272,6 @@ public class renewGUI extends JPanel {
                         ex.printStackTrace();
                         resultArea.setText("에러 발생: " + ex.getMessage());
                     }
-                    // 여기에 튜플 삭제 로직 추가
-                    // 예: DELETE FROM 테이블명 WHERE 조건
-
-                    // 삭제 후 결과 표시
                     
                 } else{
                     resultArea.setText("무조건 하나의 FROM 선택을 해야합니다.");
@@ -402,9 +395,9 @@ public class renewGUI extends JPanel {
 
         JPanel wherePanel = new JPanel(); // WHERE 패널 추가
         wherePanel.setLayout(new GridLayout(1, 2));
-        whereCheckBox = new JCheckBox("Use WHERE (use AND)");
+        JLabel whereLabel = new JLabel("WHERE (use AND)");
         whereField = new JTextField(0);
-        wherePanel.add(whereCheckBox);
+        wherePanel.add(whereLabel);
         wherePanel.add(whereField);
 
 
@@ -413,13 +406,6 @@ public class renewGUI extends JPanel {
 
         thisPanel.add(fromPanel);
         thisPanel.add(wherePanel);
-
-        whereCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                whereField.setEnabled(whereCheckBox.isSelected());
-            }
-        });
 
         return thisPanel;
     }
