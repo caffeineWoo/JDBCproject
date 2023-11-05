@@ -21,9 +21,9 @@ import javax.swing.JScrollPane;
 
 
 public class renewGUI extends JPanel {
-    String url = "jdbc:mysql://localhost/company";
+    String url = "jdbc:mysql://localhost:3306/companydb";
     String user = "root";
-    String password = "admin123";
+    String password = "renoj1331@";
     private List<JCheckBox> fromCheckboxes; // 추가: FROM 체크박스 리스트
     private JTextField columnsField;
     private JCheckBox whereCheckBox;
