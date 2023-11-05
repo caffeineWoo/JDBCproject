@@ -37,11 +37,11 @@ public class renewGUI extends JPanel {
         opsel="report";
         JPanel OpSelPanel = new JPanel(); // FROM 패널 추가
         OpSelPanel.setLayout(new GridLayout(1, 6));
-        JLabel OpSelLabel = new JLabel("\t MODE");
+        JLabel OpSelLabel = new JLabel("\t 기능");
         OpSelPanel.add(OpSelLabel);
 
         optionbtns = new ButtonGroup();
-        String[] Options = {"report", "search", "insert", "delete"}; // FROM 항목 리스트
+        String[] Options = {"전체 출력", "검색", "삽입", "삭제"}; // FROM 항목 리스트
         for (String option : Options) {
             JRadioButton optionbtn = new JRadioButton(option);
             optionbtns.add(optionbtn);

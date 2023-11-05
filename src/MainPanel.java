@@ -27,7 +27,7 @@ public class MainPanel extends JPanel {
 
         JPanel selectPanel = new JPanel(); // SELECT 패널 추가
         selectPanel.setLayout(new GridLayout(1, 2));
-        JLabel columnsLabel = new JLabel("\t SELECT");
+        JLabel columnsLabel = new JLabel("\t Select");
         columnsField = new JTextField(20);
         selectPanel.add(columnsLabel);
         selectPanel.add(columnsField);
@@ -119,10 +119,10 @@ public class MainPanel extends JPanel {
         executeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String url = "jdbc:mysql://localhost/company";
+                String url = "jdbc:mysql://localhost/companydb";
                 String user = "root";
 
-                String password = "admin123";
+                String password = "renoj1331@";
 
                 DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
 
