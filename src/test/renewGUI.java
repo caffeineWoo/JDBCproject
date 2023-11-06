@@ -21,9 +21,9 @@ import javax.swing.JScrollPane;
 
 
 public class renewGUI extends JPanel {
-    String url = "jdbc:mysql://localhost/company";
+    String url = "jdbc:mysql://localhost:3306/companydb";
     String user = "root";
-    String password = "admin123";
+    String password = "renoj1331@";
     private List<JCheckBox> fromCheckboxes; // 추가: FROM 체크박스 리스트
     private JTextField columnsField;
     private JCheckBox whereCheckBox;
@@ -286,15 +286,63 @@ public class renewGUI extends JPanel {
 
         JPanel selectPanel = new JPanel(); // SELECT 패널 추가
         selectPanel.setLayout(new GridLayout(1, 2));
-        JLabel columnsLabel = new JLabel("\t SELECT");
+        JLabel columnsLabel = new JLabel("\t 검색범위");
+        String[] fromSearchOptions = {"부서", "이름", "성별", "월급", "상사", "주소"};
+        JComboBox<String> fromComboBox = new JComboBox<>(fromSearchOptions); // 드롭다운 목록 생성
+
         columnsField = new JTextField(20);
         selectPanel.add(columnsLabel);
-        selectPanel.add(columnsField);
+        selectPanel.add(fromComboBox);
+        
+        fromComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedOption = (String) fromComboBox.getSelectedItem();
+
+                // "부서"를 선택한 경우에만 추가 드롭다운 목록을 보여주도록 설정
+                if ("부서".equals(selectedOption)) {
+                    // 드롭다운 목록을 추가할 JPanel 생성
+                    JPanel departmentPanel = new JPanel();
+                    departmentPanel.setLayout(new GridLayout(1, 2));
+                    JLabel departmentLabel = new JLabel("부서 선택");
+                    String[] departmentOptions = {"Administration", "Research", "부서3"}; // 적절한 부서 목록으로 변경
+                    JComboBox<String> departmentComboBox = new JComboBox<>(departmentOptions);
+                    departmentPanel.add(departmentLabel);
+                    departmentPanel.add(departmentComboBox);
+
+                    // SELECT 패널을 업데이트
+                    selectPanel.remove(fromComboBox); // 기존 드롭다운 목록을 삭제
+                    selectPanel.remove(columnsLabel); // 선택 레이블도 삭제
+
+                    selectPanel.add(departmentPanel); // 새로운 드롭다운 목록을 추가
+      // 레이블을 다시 추가
+
+                    // 다시 그리기
+                    selectPanel.revalidate();
+                    selectPanel.repaint();
+                } else {
+                    // 다른 옵션을 선택한 경우 기존 드롭다운 목록을 보여줌
+                    selectPanel.remove(selectPanel); // 기존 드롭다운 목록을 삭제
+                    selectPanel.remove(columnsLabel); // 선택 레이블도 삭제
+
+                    selectPanel.add(fromComboBox); // 기존 드롭다운 목록을 다시 추가
+                    selectPanel.add(columnsLabel); // 레이블을 다시 추가
+
+                    // 다시 그리기
+                    selectPanel.revalidate();
+                    selectPanel.repaint();
+                }
+            }
+        });
+
+        
 
         JPanel fromPanel = new JPanel(); // FROM 패널 추가
         fromPanel.setLayout(new GridLayout(1, 7));
         JLabel fromLabel = new JLabel("\t FROM");
         fromPanel.add(fromLabel);
+        
+
         fromCheckboxes = new ArrayList<>();
         String[] fromOptions = {"EMPLOYEE", "DEPARTMENT", "WORKS_ON", "DEPT_LOCATIONS", "PROJECT","DEPENDENT"}; // FROM 항목 리스트
         for (String option : fromOptions) {
