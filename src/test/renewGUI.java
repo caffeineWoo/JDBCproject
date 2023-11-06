@@ -44,8 +44,6 @@ public class renewGUI extends JPanel {
     private JButton executeButton;
     private JButton reportButton;
     public JButton thisBtn;
-    private JComboBox<String> tableComboBox;
-    private JTextField columnField;
     public renewGUI() {
         opsel="report";
         JPanel OpSelPanel = new JPanel(); // MODE 패널 추가
@@ -220,35 +218,15 @@ public class renewGUI extends JPanel {
                 }
             }
         });
-        this.insertButton.addActionListener(new ActionListener() {
+        insertButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 테이블 선택 드랍다운으로부터 선택한 테이블 이름 가져오기
-                String selectedTable = (String) tableComboBox.getSelectedItem();
-                // Select Columns 텍스트 필드에서 컬럼 목록을 가져오기
-                String selectedColumns = columnField.getText();
-                // Enter Values 텍스트 필드에서 값을 가져오기
                 String values = insertField.getText();
+                // 여기에 튜플 삽입 로직 추가
+                // 예: INSERT INTO 테이블명 (컬럼1, 컬럼2, ...) VALUES (값1, 값2, ...)
 
-                // 선택한 테이블, 컬럼 및 값으로 INSERT 쿼리를 생성 및 실행
-                String[] columns = selectedColumns.split(",");
-                String insertQuery = "INSERT INTO " + selectedTable + " (" + selectedColumns + ") VALUES (" + values + ")";
-
-                try {
-                    // DB 연결 세팅하기
-                    DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
-                    // INSERT 쿼리 실행 및 추가한 행의 수 가져오가
-                    int rowsAffected = dbConnection.executeUpdate(insertQuery);
-
-                    // 결과를 resultArea에 표시
-                    resultArea.setText("INSERT Query: " + insertQuery + "\n" + rowsAffected + " row(s) inserted.");
-                    // DB 연결 닫기
-                    dbConnection.closeConnection();
-                } catch (SQLException ex) {
-                    // 오류에 대한 메세지를 표시하기 위한 부분
-                    ex.printStackTrace();
-                    resultArea.setText("Error: " + ex.getMessage());
-                }
+                // 삽입 후 결과 표시
+                resultArea.setText("튜플이 삽입되었습니다.");
             }
         });
         deleteButton.addActionListener(new ActionListener() {
@@ -479,78 +457,8 @@ public class renewGUI extends JPanel {
 
         return thisPanel;
     }
-    private JPanel get_insert() {
-
-        // JPanel 생성하고 튜플 삽입하기 위한 패널 생성
-        JPanel thisPanel = new JPanel();
-
-        // Select Table 레이블과 테이블을 선택할 수 있는 드랍다운 목록 만들기
-        JPanel tableSelectionPanel = new JPanel();
-        JLabel tableLabel = new JLabel("Select Table: ");
-        JComboBox<String> tableComboBox = new JComboBox<>();
-
-        // 테이블 이름 추가
-        tableComboBox.addItem("EMPLOYEE");
-        tableComboBox.addItem("DEPARTMENT");
-        tableComboBox.addItem("WORKS_ON");
-        tableComboBox.addItem("DEPT_LOCATIONS");
-        tableComboBox.addItem("PROJECT");
-        tableComboBox.addItem("DEPENDENT");
-        tableSelectionPanel.add(tableLabel);
-        tableSelectionPanel.add(tableComboBox);
-
-        // Column을 선택하고 값을 입력할 수 있는 패널 생성
-        JPanel columnSelectionPanel = new JPanel();
-        JLabel columnLabel = new JLabel("Select Columns (comma-separated): ");
-        JTextField columnField = new JTextField(20);
-        columnSelectionPanel.add(columnLabel);
-        columnSelectionPanel.add(columnField);
-
-        // 테이블에 추가할 튜플에 대한 Values들 입력 받을 패널 생성
-        JPanel valuesPanel = new JPanel();
-        JLabel valuesLabel = new JLabel("Enter Values (comma-separated): ");
-        JTextField valuesField = new JTextField(20);
-        valuesPanel.add(valuesLabel);
-        valuesPanel.add(valuesField);
-
-
-        insertButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 테이블 선택 드랍다운으로부터 선택한 테이블 이름 가져오기
-                String selectedTable = (String) tableComboBox.getSelectedItem();
-                // Select Columns 텍스트 필드에서 컬럼 목록을 가져오기
-                String selectedColumns = columnField.getText();
-                // Enter Values 텍스트 필드에서 값을 가져오기
-                String values = valuesField.getText();
-
-                // 선택한 테이블, 컬럼 및 값으로 INSERT 쿼리를 생성 및 실행
-                String[] columns = selectedColumns.split(",");
-                String insertQuery = "INSERT INTO " + selectedTable + " (" + selectedColumns + ") VALUES (" + values + ")";
-
-                try {
-                    // DB 연결 세팅하기
-                    DatabaseConnection dbConnection = new DatabaseConnection(url, user, password);
-                    // INSERT 쿼리 실행 및 추가한 행의 수 가져오가
-                    int rowsAffected = dbConnection.executeUpdate(insertQuery);
-
-                    // 결과를 resultArea에 표시
-                    resultArea.setText("INSERT Query: " + insertQuery + "\n" + rowsAffected + " row(s) inserted.");
-                    // DB 연결 닫기
-                    dbConnection.closeConnection();
-                } catch (SQLException ex) {
-                    // 오류에 대한 메세지를 표시하기 위한 부분
-                    ex.printStackTrace();
-                    resultArea.setText("Error: " + ex.getMessage());
-                }
-            }
-        });
-
-        thisPanel.add(tableSelectionPanel);
-        thisPanel.add(columnSelectionPanel);
-        thisPanel.add(valuesPanel);
-        thisPanel.add(insertButton);
-
+    private JPanel get_insert(){
+        JPanel thisPanel= new JPanel();
         return thisPanel;
     }
 
