@@ -362,13 +362,14 @@ public class renewGUI extends JPanel {
 
     //패널에 표현될 정보를 JPanel에 담는다.
     private JPanel get_search(){
+
         JPanel fromPanel = new JPanel(); // FROM 패널 추가
         fromPanel.setLayout(new GridLayout(1, 7));
         JLabel fromLabel = new JLabel("\t 테이블 선택");
         fromPanel.add(fromLabel);
         
         fromCheckboxes = new ArrayList<>();
-        String[] fromOptions = {"EMPLOYEE", "DEPARTMENT"}; // FROM 항목 리스트
+        String[] fromOptions = {"선택해주세요","EMPLOYEE", "DEPARTMENT"}; // FROM 항목 리스트
 
         // 체크박스 목록과 옵션을 컴보박스에 추가
         DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
@@ -390,7 +391,9 @@ public class renewGUI extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedOption = (String) fromComboBox.getSelectedItem(); 
-
+                thisPanel.removeAll();
+                thisPanel.add(fromPanel);
+                fromPanel.add(fromComboBox);
                 if ("EMPLOYEE".equals(selectedOption)) {
                     // "EMPLOYEE"를 선택한 경우, 사원 관련 필드를 추가
 
