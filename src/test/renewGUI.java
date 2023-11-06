@@ -206,10 +206,18 @@ public class renewGUI extends JPanel {
 	            
                 System.out.println(whereOption);
 	            
-                if ("Department".equals(whereOption)) {
+                if ("Dno".equals(whereOption)) {
                     // "부서"를 선택한 경우, 부서 드롭다운에서 선택한 값을 가져와 조건을 설정
                     String selectedDepartment = (String) departmentComboBox.getSelectedItem();
-                    condition += "Department = '" + selectedDepartment + "'";
+                    int number = 0;
+                    if(selectedDepartment == "Administration") {
+                    	number = 4;
+                    }else if(selectedDepartment == "Research") {
+                    	number = 5;
+                    }else if(selectedDepartment == "Headquarters") {
+                    	number = 1;
+                    }
+                    condition += "Dno = " + number;
  
                 } else if ("Sex".equals(whereOption)) {
                     // "성별"을 선택한 경우, 성별 드롭다운에서 선택한 값을 가져와 조건을 설정
@@ -426,12 +434,53 @@ public class renewGUI extends JPanel {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             whereOption = (String) selectComboBox.getSelectedItem();
+                            JPanel groupPanel = new JPanel(); // GROUP BY 패널 추가
+                            groupPanel.setLayout(new GridLayout(1, 2));
+                            groupCheckBox = new JCheckBox("Use GROUP BY");
+                            groupField = new JTextField(0);
+                            groupPanel.add(groupCheckBox);
+                            groupPanel.add(groupField);
+
+                            JPanel havingPanel = new JPanel(); // GROUP BY 패널 추가
+                            havingPanel.setLayout(new GridLayout(1, 2));
+                            havingCheckBox = new JCheckBox("HAVING");
+                            havingField = new JTextField(0);
+                            havingPanel.add(havingCheckBox);
+                            havingPanel.add(havingField);
+
+                            JPanel orderPanel = new JPanel(); // ORDER BY 패널 추가
+                            orderPanel.setLayout(new GridLayout(1, 2));
+                            orderCheckBox = new JCheckBox("Use ORDER BY");
+                            orderField = new JTextField(0);
+                            orderPanel.add(orderCheckBox);
+                            orderPanel.add(orderField);
+
+                            groupCheckBox.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    groupField.setEnabled(groupCheckBox.isSelected());
+                                }
+                            });
+                            orderCheckBox.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    orderField.setEnabled(orderCheckBox.isSelected());
+                                }
+                            });
+                            havingCheckBox.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    havingField.setEnabled(havingCheckBox.isSelected());
+                                }
+                            });
 
                             // 이전 드롭다운 목록을 제거
                             thisPanel.removeAll();
                             thisPanel.add(fromPanel);
                             thisPanel.add(employeeWherePanel);
-                            
+                            thisPanel.add(groupPanel);
+                            thisPanel.add(havingPanel);
+                            thisPanel.add(orderPanel);
                             // 추가 필드를 원하는 만큼 계속 추가
 
                             if ("Department".equals(whereOption)) {
@@ -439,7 +488,7 @@ public class renewGUI extends JPanel {
                                 JPanel departmentPanel = new JPanel();
                                 departmentPanel.setLayout(new GridLayout(1, 2));
                                 JLabel departmentLabel = new JLabel("부서 선택");
-                                String[] departmentOptions = {"Administration", "Research", "Headquarters"}; // 적절한 부서 목록으로 변경
+                                String[] departmentOptions = {"AdministrationAdministration", "Research", "Headquarters"}; // 적절한 부서 목록으로 변경
                                 departmentComboBox = new JComboBox<>(departmentOptions);
                                 departmentPanel.add(departmentLabel);
                                 departmentPanel.add(departmentComboBox);
@@ -660,51 +709,11 @@ public class renewGUI extends JPanel {
                         }
                     });
                     
-                    JPanel groupPanel = new JPanel(); // GROUP BY 패널 추가
-                    groupPanel.setLayout(new GridLayout(1, 2));
-                    groupCheckBox = new JCheckBox("Use GROUP BY");
-                    groupField = new JTextField(0);
-                    groupPanel.add(groupCheckBox);
-                    groupPanel.add(groupField);
 
-                    JPanel havingPanel = new JPanel(); // GROUP BY 패널 추가
-                    havingPanel.setLayout(new GridLayout(1, 2));
-                    havingCheckBox = new JCheckBox("HAVING");
-                    havingField = new JTextField(0);
-                    havingPanel.add(havingCheckBox);
-                    havingPanel.add(havingField);
-
-                    JPanel orderPanel = new JPanel(); // ORDER BY 패널 추가
-                    orderPanel.setLayout(new GridLayout(1, 2));
-                    orderCheckBox = new JCheckBox("Use ORDER BY");
-                    orderField = new JTextField(0);
-                    orderPanel.add(orderCheckBox);
-                    orderPanel.add(orderField);
-
-                    groupCheckBox.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            groupField.setEnabled(groupCheckBox.isSelected());
-                        }
-                    });
-                    orderCheckBox.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            orderField.setEnabled(orderCheckBox.isSelected());
-                        }
-                    });
-                    havingCheckBox.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            havingField.setEnabled(havingCheckBox.isSelected());
-                        }
-                    });
 
                     thisPanel.add(employeeWherePanel);
 
-                    thisPanel.add(groupPanel);
-                    thisPanel.add(havingPanel);
-                    thisPanel.add(orderPanel);
+     
                 }
 
                 
