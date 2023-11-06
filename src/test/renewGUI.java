@@ -46,6 +46,15 @@ public class renewGUI extends JPanel {
     public JButton thisBtn;
     private JComboBox<String> tableComboBox;
     private JTextField columnField;
+    
+    private String selectedOption;
+    private JComboBox<String> departmentComboBox;
+    private JComboBox<String> genderComboBox;
+    private JTextField salaryField;
+    private JTextField headField;
+    private JTextField addressField;
+    private JTextField ssnField;
+  
     public renewGUI() {
         opsel="report";
         JPanel OpSelPanel = new JPanel(); // MODE 패널 추가
@@ -191,9 +200,33 @@ public class renewGUI extends JPanel {
                 }
                 query += " SELECT " + columns;
                 query += fromClause;
-                String condition = whereField.getText();
-                if (whereCheckBox.isSelected()) {
-                    query += " WHERE " + condition;
+                String condition = "";
+
+                if ("Department".equals(selectedOption)) {
+                    // "부서"를 선택한 경우, 부서 드롭다운에서 선택한 값을 가져와 조건을 설정
+                    String selectedDepartment = (String) departmentComboBox.getSelectedItem();
+                    condition = "Department = '" + selectedDepartment + "'";
+                    System.out.println(condition);
+                } else if ("Sex".equals(selectedOption)) {
+                    // "성별"을 선택한 경우, 성별 드롭다운에서 선택한 값을 가져와 조건을 설정
+                    String selectedGender = (String) genderComboBox.getSelectedItem();
+                    condition = "Sex = '" + selectedGender + "'";
+                } else if ("Salary".equals(selectedOption)) {
+                    // "연봉"을 선택한 경우, 연봉을 입력받는 텍스트 필드의 값을 가져와 조건을 설정
+                    String selectedSalary = salaryField.getText();
+                    condition = "Salary = " + selectedSalary;
+                } else if ("Super_ssn".equals(selectedOption)) {
+                    // "상사"를 선택한 경우, 상사를 입력받는 텍스트 필드의 값을 가져와 조건을 설정
+                    String selectedSuperSsn = headField.getText();
+                    condition = "Super_ssn = '" + selectedSuperSsn + "'";
+                } else if ("Address".equals(selectedOption)) {
+                    // "주소"를 선택한 경우, 주소를 입력받는 텍스트 필드의 값을 가져와 조건을 설정
+                    String selectedAddress = addressField.getText();
+                    condition = "Address = '" + selectedAddress + "'";
+                } else if ("Ssn".equals(selectedOption)) {
+                    // "이름"을 선택한 경우, 이름을 입력받는 텍스트 필드의 값을 가져와 조건을 설정
+                    String selectedSsn = ssnField.getText();
+                    condition = "Ssn = '" + selectedSsn + "'";
                 }
                 String groupBy = groupField.getText();
                 if (groupCheckBox.isSelected()) {
@@ -305,137 +338,218 @@ public class renewGUI extends JPanel {
 
     //패널에 표현될 정보를 JPanel에 담는다.
     private JPanel get_search(){
+        JPanel fromPanel = new JPanel(); // FROM 패널 추가
+        fromPanel.setLayout(new GridLayout(1, 7));
+        JLabel fromLabel = new JLabel("\t 테이블 선택");
+        fromPanel.add(fromLabel);
+        
+        fromCheckboxes = new ArrayList<>();
+        String[] fromOptions = {"EMPLOYEE", "DEPARTMENT", "WORKS_ON", "DEPT_LOCATIONS", "PROJECT", "DEPENDENT"}; // FROM 항목 리스트
 
-        JPanel selectPanel = new JPanel(); // SELECT 패널 추가
-        selectPanel.setLayout(new GridLayout(1, 2));
-        JLabel columnsLabel = new JLabel("\t 검색범위");
-        String[] fromSearchOptions = {"부서", "이름", "성별", "월급", "상사", "주소"};
-        JComboBox<String> fromComboBox = new JComboBox<>(fromSearchOptions); // 드롭다운 목록 생성
+        // 체크박스 목록과 옵션을 컴보박스에 추가
+        DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<>();
+        for (String option : fromOptions) {
+            comboBoxModel.addElement(option);
+        }
 
-        columnsField = new JTextField(20);
-        selectPanel.add(columnsLabel);
-        selectPanel.add(fromComboBox);
+        // 컴보박스 생성
+        JComboBox<String> fromComboBox = new JComboBox<>(comboBoxModel);
+        fromPanel.add(fromComboBox);
+        
+        JPanel thisPanel= new JPanel(new GridLayout(6, 1));
+        thisPanel.add(fromPanel);
+
+  
         
         fromComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedOption = (String) fromComboBox.getSelectedItem();
+                String selectedOption = (String) fromComboBox.getSelectedItem(); // 기존 드롭다운 목록을 삭제
 
-                // "부서"를 선택한 경우에만 추가 드롭다운 목록을 보여주도록 설정
-                if ("부서".equals(selectedOption)) {
-                    // 드롭다운 목록을 추가할 JPanel 생성
-                    JPanel departmentPanel = new JPanel();
-                    departmentPanel.setLayout(new GridLayout(1, 2));
-                    JLabel departmentLabel = new JLabel("부서 선택");
-                    String[] departmentOptions = {"Administration", "Research", "부서3"}; // 적절한 부서 목록으로 변경
-                    JComboBox<String> departmentComboBox = new JComboBox<>(departmentOptions);
-                    departmentPanel.add(departmentLabel);
-                    departmentPanel.add(departmentComboBox);
+                if ("EMPLOYEE".equals(selectedOption)) {
+                    // "EMPLOYEE"를 선택한 경우, 사원 관련 필드를 추가
 
-                    // SELECT 패널을 업데이트
-                    selectPanel.remove(fromComboBox); // 기존 드롭다운 목록을 삭제
-                    selectPanel.remove(columnsLabel); // 선택 레이블도 삭제
+                	JPanel employeeWherePanel = new JPanel(); // SELECT 패널 추가
 
-                    selectPanel.add(departmentPanel); // 새로운 드롭다운 목록을 추가
-      // 레이블을 다시 추가
+                	employeeWherePanel.setLayout(new GridLayout(1, 2));
+                    JLabel columnsLabel = new JLabel("\t 검색범위");
+                    String[] fromSearchOptions = {"Department", "Sex", "Salary", "Super_ssn", "Address", "Ssn"};
+                    JComboBox<String> selectComboBox = new JComboBox<>(fromSearchOptions); // 드롭다운 목록 생성
 
-                    // 다시 그리기
-                    selectPanel.revalidate();
-                    selectPanel.repaint();
-                } else {
-                    // 다른 옵션을 선택한 경우 기존 드롭다운 목록을 보여줌
-                    selectPanel.remove(selectPanel); // 기존 드롭다운 목록을 삭제
-                    selectPanel.remove(columnsLabel); // 선택 레이블도 삭제
+                    columnsField = new JTextField(20);
+                    employeeWherePanel.add(columnsLabel);
+                    employeeWherePanel.add(selectComboBox);
 
-                    selectPanel.add(fromComboBox); // 기존 드롭다운 목록을 다시 추가
-                    selectPanel.add(columnsLabel); // 레이블을 다시 추가
+                    selectComboBox.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String selectedOption = (String) selectComboBox.getSelectedItem();
 
-                    // 다시 그리기
-                    selectPanel.revalidate();
-                    selectPanel.repaint();
+                            // 이전 드롭다운 목록을 제거
+                            thisPanel.removeAll();
+                            thisPanel.add(fromPanel);
+                            thisPanel.add(employeeWherePanel);
+                            
+                            // 추가 필드를 원하는 만큼 계속 추가
+
+                            if ("Department".equals(selectedOption)) {
+                                // "부서"를 선택한 경우, 부서 드롭다운 목록 추가
+                                JPanel departmentPanel = new JPanel();
+                                departmentPanel.setLayout(new GridLayout(1, 2));
+                                JLabel departmentLabel = new JLabel("부서 선택");
+                                String[] departmentOptions = {"Administration", "Research", "Headquarters"}; // 적절한 부서 목록으로 변경
+                                JComboBox<String> departmentComboBox = new JComboBox<>(departmentOptions);
+                                departmentPanel.add(departmentLabel);
+                                departmentPanel.add(departmentComboBox);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(departmentPanel);
+                                departmentComboBox.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        
+                                    }
+                                });
+                            
+                            } else if ("Sex".equals(selectedOption)) {
+                                // "성별"을 선택한 경우, 성별 드롭다운 목록 추가
+                                JPanel genderPanel = new JPanel();
+                                genderPanel.setLayout(new GridLayout(1, 2));
+                                JLabel genderLabel = new JLabel("성별 선택");
+                                String[] genderOptions = {"M", "F"}; // 적절한 성별 목록으로 변경
+                                JComboBox<String> genderComboBox = new JComboBox<>(genderOptions);
+                                genderPanel.add(genderLabel);
+                                genderPanel.add(genderComboBox);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(genderPanel);
+                            }
+                            
+                            else if ("Salary".equals(selectedOption)) {
+                                // "연봉"을 선택한 경우, 연봉을 입력받는 텍스트 필드 추가
+                                JPanel salaryPanel = new JPanel();
+                                salaryPanel.setLayout(new GridLayout(1, 2));
+                                JLabel salaryLabel = new JLabel("연봉 입력");
+                                JTextField salaryField = new JTextField(20); // 숫자를 입력받을 텍스트 필드
+                                salaryPanel.add(salaryLabel);
+                                salaryPanel.add(salaryField);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(salaryPanel);
+                            }
+                            
+                            else if ("Super_ssn".equals(selectedOption)) {
+                                // "연봉"을 선택한 경우, 연봉을 입력받는 텍스트 필드 추가
+                                JPanel headPanel = new JPanel();
+                                headPanel.setLayout(new GridLayout(1, 2));
+                                JLabel headLabel = new JLabel("상사 입력");
+                                JTextField headField = new JTextField(20); // 숫자를 입력받을 텍스트 필드
+                                headPanel.add(headLabel); 
+                                headPanel.add(headField);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(headPanel);
+                            }
+
+                            
+                            else if ("Address".equals(selectedOption)) {
+                                // "연봉"을 선택한 경우, 연봉을 입력받는 텍스트 필드 추가
+                                JPanel addressPanel = new JPanel();
+                                addressPanel.setLayout(new GridLayout(1, 2));
+                                JLabel addressLabel = new JLabel("주소 입력");
+                                JTextField addressField = new JTextField(20); // 숫자를 입력받을 텍스트 필드
+                                addressPanel.add(addressLabel);
+                                addressPanel.add(addressField);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(addressPanel);
+                            }
+                            else if ("Ssn".equals(selectedOption)) {
+                                // "연봉"을 선택한 경우, 연봉을 입력받는 텍스트 필드 추가
+                                JPanel ssnPanel = new JPanel();
+                                ssnPanel.setLayout(new GridLayout(1, 2));
+                                JLabel ssnLabel = new JLabel("이름 입력");
+                                JTextField ssnField = new JTextField(20); // 숫자를 입력받을 텍스트 필드
+                                ssnPanel.add(ssnLabel);
+                                ssnPanel.add(ssnField);
+
+                                // SELECT 패널 업데이트
+                                thisPanel.add(ssnPanel);
+                            }
+
+                            
+                            // 다시 그리기
+                            thisPanel.revalidate();
+                            thisPanel.repaint();
+                        }
+                    });
+                    JPanel groupPanel = new JPanel(); // GROUP BY 패널 추가
+                    groupPanel.setLayout(new GridLayout(1, 2));
+                    groupCheckBox = new JCheckBox("Use GROUP BY");
+                    groupField = new JTextField(0);
+                    groupPanel.add(groupCheckBox);
+                    groupPanel.add(groupField);
+
+                    JPanel havingPanel = new JPanel(); // GROUP BY 패널 추가
+                    havingPanel.setLayout(new GridLayout(1, 2));
+                    havingCheckBox = new JCheckBox("HAVING");
+                    havingField = new JTextField(0);
+                    havingPanel.add(havingCheckBox);
+                    havingPanel.add(havingField);
+
+                    JPanel orderPanel = new JPanel(); // ORDER BY 패널 추가
+                    orderPanel.setLayout(new GridLayout(1, 2));
+                    orderCheckBox = new JCheckBox("Use ORDER BY");
+                    orderField = new JTextField(0);
+                    orderPanel.add(orderCheckBox);
+                    orderPanel.add(orderField);
+
+                    groupCheckBox.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            groupField.setEnabled(groupCheckBox.isSelected());
+                        }
+                    });
+                    orderCheckBox.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            orderField.setEnabled(orderCheckBox.isSelected());
+                        }
+                    });
+                    havingCheckBox.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            havingField.setEnabled(havingCheckBox.isSelected());
+                        }
+                    });
+
+                    thisPanel.add(employeeWherePanel);
+
+                    thisPanel.add(groupPanel);
+                    thisPanel.add(havingPanel);
+                    thisPanel.add(orderPanel);
+
+                } else if ("DEPARTMENT".equals(selectedOption)) {
+                    // "DEPARTMENT"를 선택한 경우, 부서 관련 필드를 추가
+                	thisPanel.remove(fromPanel);
+                    fromPanel.add(new JLabel("부서 관련 필드 1"));
+                    fromPanel.add(new JTextField(20));
+                    fromPanel.add(new JLabel("부서 관련 필드 2"));
+                    fromPanel.add(new JTextField(20));
+                    // 추가 필드를 원하는 만큼 계속 추가
                 }
+
+                
+
             }
         });
-
+        
         
 
-        JPanel fromPanel = new JPanel(); // FROM 패널 추가
-        fromPanel.setLayout(new GridLayout(1, 7));
-        JLabel fromLabel = new JLabel("\t FROM");
-        fromPanel.add(fromLabel);
-        
 
-        fromCheckboxes = new ArrayList<>();
-        String[] fromOptions = {"EMPLOYEE", "DEPARTMENT", "WORKS_ON", "DEPT_LOCATIONS", "PROJECT","DEPENDENT"}; // FROM 항목 리스트
-        for (String option : fromOptions) {
-            JCheckBox checkbox = new JCheckBox(option);
-            fromCheckboxes.add(checkbox);
-            fromPanel.add(checkbox);
-        }
-
-
-        JPanel wherePanel = new JPanel(); // WHERE 패널 추가
-        wherePanel.setLayout(new GridLayout(1, 2));
-        whereCheckBox = new JCheckBox("Use WHERE (use AND)");
-        whereField = new JTextField(0);
-        wherePanel.add(whereCheckBox);
-        wherePanel.add(whereField);
-
-        JPanel groupPanel = new JPanel(); // GROUP BY 패널 추가
-        groupPanel.setLayout(new GridLayout(1, 2));
-        groupCheckBox = new JCheckBox("Use GROUP BY");
-        groupField = new JTextField(0);
-        groupPanel.add(groupCheckBox);
-        groupPanel.add(groupField);
-
-        JPanel havingPanel = new JPanel(); // GROUP BY 패널 추가
-        havingPanel.setLayout(new GridLayout(1, 2));
-        havingCheckBox = new JCheckBox("HAVING");
-        havingField = new JTextField(0);
-        havingPanel.add(havingCheckBox);
-        havingPanel.add(havingField);
-
-        JPanel orderPanel = new JPanel(); // ORDER BY 패널 추가
-        orderPanel.setLayout(new GridLayout(1, 2));
-        orderCheckBox = new JCheckBox("Use ORDER BY");
-        orderField = new JTextField(0);
-        orderPanel.add(orderCheckBox);
-        orderPanel.add(orderField);
-
-        JPanel thisPanel= new JPanel(new GridLayout(6, 1));
-        
-        thisPanel.add(selectPanel);
-        thisPanel.add(fromPanel);
-        thisPanel.add(wherePanel);
-        thisPanel.add(groupPanel);
-        thisPanel.add(havingPanel);
-        thisPanel.add(orderPanel);
-
-        whereCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                whereField.setEnabled(whereCheckBox.isSelected());
-            }
-        });
-        groupCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                groupField.setEnabled(groupCheckBox.isSelected());
-            }
-        });
-        orderCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                orderField.setEnabled(orderCheckBox.isSelected());
-            }
-        });
-        havingCheckBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                havingField.setEnabled(havingCheckBox.isSelected());
-            }
-        });
         return thisPanel;
+
+       
     }
     private JPanel get_report() {
         JPanel thisPanel = new JPanel();
